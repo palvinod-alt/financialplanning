@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Couple Financial Planning Tool — Vinod & Namrata</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0c0f14;
+    --surface: #141820;
+    --surface2: #1c2230;
+    --border: #252d3d;
+    --accent: #f0b429;
+    --accent2: #38bdf8;
+    --accent3: #34d399;
+    --danger: #f87171;
+    --text: #e8ecf0;
+    --muted: #6b7a95;
+    --fire: #ff6b35;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #0c0f14 0%, #141820 60%, #1a1030 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px 24px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  header h1 span { color: var(--accent); }
+  header .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; color: var(--muted); letter-spacing: 0.15em;
+    text-transform: uppercase; margin-top: 2px;
+  }
+  .fire-badge {
+    background: linear-gradient(135deg, var(--fire), var(--accent));
+    color: #000; font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em;
+    padding: 5px 12px; border-radius: 20px;
+    text-transform: uppercase;
+  }
+
+  /* Layout */
+  .layout { display: grid; grid-template-columns: 320px 1fr; min-height: calc(100vh - 80px); }
+
+  /* Sidebar */
+  aside {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 24px;
+    overflow-y: auto;
+    position: sticky; top: 80px; height: calc(100vh - 80px);
+  }
+  .section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 0.18em;
+    color: var(--muted); text-transform: uppercase;
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .input-group { margin-bottom: 18px; }
+  .input-group label {
+    display: block; font-size: 0.78rem; color: var(--muted);
+    margin-bottom: 6px; font-family: 'DM Sans', sans-serif;
+  }
+  .input-row { display: flex; align-items: center; gap: 8px; }
+  .input-row input[type=range] {
+    flex: 1; accent-color: var(--accent);
+    height: 3px; cursor: pointer;
+  }
+  .val-display {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem; color: var(--accent);
+    min-width: 52px; text-align: right;
+  }
+  input[type=number] {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px; padding: 7px 10px;
+    font-family: 'DM Mono', monospace; font-size: 0.82rem;
+    outline: none; transition: border-color 0.2s;
+  }
+  input[type=number]:focus { border-color: var(--accent); }
+
+  .sidebar-section { margin-bottom: 28px; }
+  .one-time-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    font-size: 0.75rem;
+  }
+  .one-time-row label { color: var(--muted); margin-bottom: 4px; display: block; }
+
+  /* Main */
+  main { padding: 28px 32px; overflow-y: auto; }
+
+  /* KPI Cards */
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+    position: relative; overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); border-color: var(--accent2); }
+  .kpi-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .kpi-card.gold::before { background: var(--accent); }
+  .kpi-card.blue::before { background: var(--accent2); }
+  .kpi-card.green::before { background: var(--accent3); }
+  .kpi-card.fire::before { background: var(--fire); }
+  .kpi-label {
+    font-size: 0.65rem; font-family: 'DM Mono', monospace;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 700; line-height: 1;
+    color: var(--text);
+  }
+  .kpi-value.gold { color: var(--accent); }
+  .kpi-value.blue { color: var(--accent2); }
+  .kpi-value.green { color: var(--accent3); }
+  .kpi-value.fire { color: var(--fire); }
+  .kpi-sub { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+
+  /* Chart area */
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.15em;
+    color: var(--muted); text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  canvas { max-height: 240px; }
+  canvas.tall { max-height: 300px; }
+
+  /* Table */
+  .table-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin-bottom: 28px;
+  }
+  .table-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+  }
+  .table-wrapper { overflow-x: auto; max-height: 420px; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+  th {
+    background: var(--surface2); padding: 10px 14px;
+    font-family: 'DM Mono', monospace; font-size: 0.6rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    text-align: right; position: sticky; top: 0; z-index: 1;
+    white-space: nowrap;
+  }
+  th:first-child, th:nth-child(2) { text-align: left; }
+  td {
+    padding: 9px 14px; border-bottom: 1px solid rgba(37,45,61,0.5);
+    text-align: right; font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+  }
+  td:first-child, td:nth-child(2) { text-align: left; color: var(--muted); }
+  tr:hover td { background: rgba(240,180,41,0.04); }
+  .positive { color: var(--accent3); }
+  .negative { color: var(--danger); }
+  .fire-year td { background: rgba(255,107,53,0.08) !important; }
+  .fire-year td:first-child { color: var(--fire) !important; font-weight: 500; }
+
+  /* Scenario toggle */
+  .scenario-row {
+    display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .scenario-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); padding: 6px 14px; border-radius: 20px;
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.06em;
+  }
+  .scenario-btn.active {
+    background: var(--accent); border-color: var(--accent);
+    color: #000; font-weight: 500;
+  }
+
+  /* Tooltip */
+  .tooltip-pill {
+    display: inline-block; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.68rem;
+    padding: 2px 8px; border-radius: 10px; margin-left: 8px;
+  }
+
+  /* Monte Carlo */
+  .mc-info {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px; margin-top: 12px;
+    font-size: 0.75rem; color: var(--muted); line-height: 1.7;
+  }
+  .mc-info strong { color: var(--text); }
+
+  /* Run button */
+  .run-btn {
+    width: 100%; padding: 11px;
+    background: linear-gradient(135deg, var(--accent), var(--fire));
+    border: none; border-radius: 8px; color: #000;
+    font-family: 'DM Mono', monospace; font-size: 0.8rem;
+    font-weight: 500; letter-spacing: 0.08em;
+    cursor: pointer; transition: opacity 0.2s; margin-top: 8px;
+    text-transform: uppercase;
+  }
+  .run-btn:hover { opacity: 0.88; }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 280px 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; }
+    .chart-grid { grid-template-columns: 1fr; }
+    header { padding: 16px 20px; }
+    main { padding: 16px; }
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  .highlight-row td { background: rgba(56,189,248,0.06) !important; }
+
+  .ot-row {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 7px; padding: 10px 12px; margin-bottom: 8px;
+  }
+  .ot-row-top {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 7px;
+  }
+  .ot-label-input {
+    flex: 1; background: transparent; border: none; border-bottom: 1px solid var(--border);
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.78rem;
+    padding: 3px 0; outline: none;
+  }
+  .ot-label-input:focus { border-bottom-color: var(--accent); }
+  .ot-label-input::placeholder { color: var(--muted); }
+  .ot-del-btn {
+    background: transparent; border: none; color: var(--muted);
+    font-size: 0.85rem; cursor: pointer; padding: 2px 4px;
+    transition: color 0.15s; line-height: 1;
+  }
+  .ot-del-btn:hover { color: var(--danger); }
+  .ot-row-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ot-field label { display: block; font-size: 0.62rem; color: var(--muted); margin-bottom: 4px; font-family:'DM Mono',monospace; letter-spacing:0.06em; text-transform:uppercase; }
+  .ot-field input {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); border-radius: 5px; padding: 5px 8px;
+    font-family: 'DM Mono', monospace; font-size: 0.78rem; outline: none;
+    transition: border-color 0.2s;
+  }
+  .ot-field input:focus { border-color: var(--accent); }
+
+  .kid-toggle {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--muted); padding: 3px 12px; border-radius: 12px;
+    font-family: 'DM Mono', monospace; font-size: 0.68rem;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .kid-toggle.active {
+    background: var(--accent3); border-color: var(--accent3);
+    color: #000; font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Couple<span>.</span> Financial Planner</h1>
+    <div class="subtitle" id="header_subtitle">Financial Independence Simulation</div>
+  </div>
+  <div class="fire-badge">💑 Plan Together</div>
+</header>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside>
+  <div class="sidebar-section">
+    <div class="section-title">People</div>
+    <div class="one-time-row">
+      <div>
+        <label>Partner 1 Name</label>
+        <input type="text" id="p1_name" value="" placeholder="e.g. Arjun" class="ot-label-input" style="border:1px solid var(--border);border-radius:5px;padding:6px 8px;width:100%;background:var(--surface2);">
+      </div>
+      <div>
+        <label>Current Age</label>
+        <input type="number" id="p1_age" value="" min="20" max="60" style="width:100%" placeholder="Age">
+      </div>
+    </div>
+    <div class="one-time-row" style="margin-top:8px">
+      <div>
+        <label>Partner 2 Name</label>
+        <input type="text" id="p2_name" value="" placeholder="e.g. Priya" class="ot-label-input" style="border:1px solid var(--border);border-radius:5px;padding:6px 8px;width:100%;background:var(--surface2);">
+      </div>
+      <div>
+        <label>Current Age</label>
+        <input type="number" id="p2_age" value="" min="20" max="60" style="width:100%" placeholder="Age">
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-title">Growth Rates</div>
+    <div class="input-group">
+      <label><span class="lbl-p2">Partner 2</span> Salary Growth</label>
+      <div class="input-row">
+        <input type="range" id="r_namrata_raise" min="1" max="20" step="0.5" value="5">
+        <span class="val-display" id="v_namrata_raise">5.0%</span>
+      </div>
+    </div>
+    <div class="input-group">
+      <label><span class="lbl-p1">Partner 1</span> Salary Growth</label>
+      <div class="input-row">
+        <input type="range" id="r_vinod_raise" min="1" max="20" step="0.5" value="4">
+        <span class="val-display" id="v_vinod_raise">4.0%</span>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>Expenditure Inflation</label>
+      <div class="input-row">
+        <input type="range" id="r_inflation" min="4" max="15" step="0.5" value="8">
+        <span class="val-display" id="v_inflation">8.0%</span>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>Yearly Investment Return</label>
+      <div class="input-row">
+        <input type="range" id="r_roi" min="6" max="18" step="0.5" value="11">
+        <span class="val-display" id="v_roi">11.0%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-title">Starting Values (₹)</div>
+    <div class="input-group">
+      <label><span class="lbl-p1">Partner 1</span> Monthly Take-Home (2026)</label>
+      <input type="number" id="vinod_salary" value="" step="5000" placeholder="e.g. 300000">
+    </div>
+    <div class="input-group">
+      <label><span class="lbl-p1">Partner 1</span> Annual Bonus (2026)</label>
+      <input type="number" id="vinod_bonus" value="" step="50000" placeholder="e.g. 700000">
+    </div>
+    <div class="input-group">
+      <label><span class="lbl-p2">Partner 2</span> Monthly Take-Home (2026)</label>
+      <input type="number" id="namrata_salary" value="" step="5000" placeholder="e.g. 290000">
+    </div>
+    <div class="input-group">
+      <label><span class="lbl-p2">Partner 2</span> Annual Bonus (2026)</label>
+      <input type="number" id="namrata_bonus" value="" step="50000" placeholder="e.g. 1800000">
+    </div>
+    <div class="input-group">
+      <label>Monthly Expenses (₹/month)</label>
+      <input type="number" id="monthly_exp" value="" step="5000" placeholder="e.g. 120000">
+    </div>
+    <div class="input-group">
+      <label>Yearly Travel Budget (₹)</label>
+      <input type="number" id="travel" value="" step="10000" placeholder="e.g. 400000">
+    </div>
+    <div class="input-group">
+      <label>Discretionary Expenses (₹)</label>
+      <input type="number" id="discretionary" value="" step="10000" placeholder="e.g. 500000">
+    </div>
+    <div class="input-group">
+      <label><span class="lbl-p1">Partner 1</span> Starting Corpus (₹)</label>
+      <input type="number" id="corpus_vinod" value="" step="100000" placeholder="e.g. 5000000">
+    </div>
+    <div class="input-group">
+      <label><span class="lbl-p2">Partner 2</span> Starting Corpus (₹)</label>
+      <input type="number" id="corpus_namrata" value="" step="100000" placeholder="e.g. 3000000">
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-title">Retirals — <span class="lbl-p1">Partner 1</span> (2026 ₹)</div>
+    <div class="one-time-row">
+      <div>
+        <label>PF Balance</label>
+        <input type="number" id="pf_vinod_bal" value="" step="100000" placeholder="0">
+      </div>
+      <div>
+        <label>NPS Balance</label>
+        <input type="number" id="nps_vinod_bal" value="" step="50000" placeholder="0">
+      </div>
+    </div>
+    <div class="one-time-row" style="margin-top:10px">
+      <div>
+        <label>PF Contrib / yr (₹)</label>
+        <input type="number" id="pf_vinod_contrib" value="" step="10000" placeholder="0">
+      </div>
+      <div>
+        <label>NPS Contrib / yr (₹)</label>
+        <input type="number" id="nps_vinod_contrib" value="" step="10000" placeholder="0">
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-title">Retirals — <span class="lbl-p2">Partner 2</span> (2026 ₹)</div>
+    <div class="one-time-row">
+      <div>
+        <label>PF Balance</label>
+        <input type="number" id="pf_namrata_bal" value="" step="100000" placeholder="0">
+      </div>
+      <div>
+        <label>NPS Balance</label>
+        <input type="number" id="nps_namrata_bal" value="" step="50000" placeholder="0">
+      </div>
+    </div>
+    <div class="one-time-row" style="margin-top:10px">
+      <div>
+        <label>PF Contrib / yr (₹)</label>
+        <input type="number" id="pf_namrata_contrib" value="" step="10000" placeholder="0">
+      </div>
+      <div>
+        <label>NPS Contrib / yr (₹)</label>
+        <input type="number" id="nps_namrata_contrib" value="" step="10000" placeholder="0">
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-title">Retiral Growth Rates</div>
+    <div class="input-group">
+      <label>PF Interest Rate (EPFO)</label>
+      <div class="input-row">
+        <input type="range" id="r_pf_rate" min="7" max="10" step="0.1" value="8.5">
+        <span class="val-display" id="v_pf_rate">8.5%</span>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>NPS Return Rate</label>
+      <div class="input-row">
+        <input type="range" id="r_nps_rate" min="8" max="14" step="0.5" value="10">
+        <span class="val-display" id="v_nps_rate">10.0%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-title">FIRE Target Ages</div>
+    <div class="input-group">
+      <label><span class="lbl-p1">Partner 1</span> FIRE Age <span id="lbl_p1_cur_age" style="color:var(--muted)">(currently 35)</span></label>
+      <div class="input-row">
+        <input type="range" id="r_vinod_fire" min="38" max="55" step="1" value="42">
+        <span class="val-display" id="v_vinod_fire">42</span>
+      </div>
+    </div>
+    <div class="input-group">
+      <label><span class="lbl-p2">Partner 2</span> FIRE Age <span id="lbl_p2_cur_age" style="color:var(--muted)">(currently 32)</span></label>
+      <div class="input-row">
+        <input type="range" id="r_namrata_fire" min="35" max="55" step="1" value="42">
+        <span class="val-display" id="v_namrata_fire">42</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-title">Kids Planning</div>
+
+    <div class="input-group">
+      <label>Children Expense Inflation <span style="color:var(--fire);font-size:0.68rem;">(independent rate)</span></label>
+      <div class="input-row">
+        <input type="range" id="r_kid_inflation" min="8" max="20" step="0.5" value="12">
+        <span class="val-display" id="v_kid_inflation">12.0%</span>
+      </div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:4px;">All kid costs entered in <strong style="color:var(--accent)">2026 ₹</strong> — inflated using this rate</div>
+    </div>
+
+    <!-- Kid 1 -->
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:0.78rem;color:var(--text);font-weight:500;">👶 Kid 1</span>
+        <div style="display:flex;gap:6px;">
+          <button class="kid-toggle active" id="kid1_yes" onclick="toggleKid(1,'yes')">Yes</button>
+          <button class="kid-toggle" id="kid1_no" onclick="toggleKid(1,'no')">No</button>
+        </div>
+      </div>
+      <div id="kid1_inputs">
+        <div class="input-group">
+          <label>Namrata's age when born</label>
+          <div class="input-row">
+            <input type="range" id="r_kid1_age" min="30" max="40" step="1" value="33">
+            <span class="val-display" id="v_kid1_age">33</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Annual base cost — 2026 ₹ (₹/yr)</label>
+          <input type="number" id="kid1_cost" value="300000" step="25000">
+        </div>
+        <div class="input-group">
+          <label>School fees extra — 2026 ₹ (age 5–17, ₹/yr)</label>
+          <input type="number" id="kid1_school" value="250000" step="25000">
+        </div>
+        <div class="input-group">
+          <label>College lump sum — 2026 ₹ (at age 18, ₹)</label>
+          <input type="number" id="kid1_college" value="2000000" step="100000">
+        </div>
+      </div>
+    </div>
+
+    <!-- Kid 2 -->
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:0.78rem;color:var(--text);font-weight:500;">👶 Kid 2</span>
+        <div style="display:flex;gap:6px;">
+          <button class="kid-toggle" id="kid2_yes" onclick="toggleKid(2,'yes')">Yes</button>
+          <button class="kid-toggle active" id="kid2_no" onclick="toggleKid(2,'no')">No</button>
+        </div>
+      </div>
+      <div id="kid2_inputs" style="display:none;">
+        <div class="input-group">
+          <label>Namrata's age when born</label>
+          <div class="input-row">
+            <input type="range" id="r_kid2_age" min="30" max="42" step="1" value="36">
+            <span class="val-display" id="v_kid2_age">36</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Annual base cost — 2026 ₹ (₹/yr)</label>
+          <input type="number" id="kid2_cost" value="300000" step="25000">
+        </div>
+        <div class="input-group">
+          <label>School fees extra — 2026 ₹ (age 5–17, ₹/yr)</label>
+          <input type="number" id="kid2_school" value="250000" step="25000">
+        </div>
+        <div class="input-group">
+          <label>College lump sum — 2026 ₹ (at age 18, ₹)</label>
+          <input type="number" id="kid2_college" value="2000000" step="100000">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-title">One-Time Outflows</div>
+    <div style="font-size:0.65rem;color:var(--muted);margin-bottom:12px;">Enter in <strong style="color:var(--accent)">today's 2026 ₹</strong> — inflated to payment year using Expenditure Inflation rate</div>
+    <div id="ot_list"></div>
+    <button onclick="addOTRow()" style="width:100%;margin-top:8px;padding:7px;background:transparent;border:1px dashed var(--border);border-radius:6px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">+ Add Expense</button>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-title">Monte Carlo</div>
+    <div class="input-group">
+      <label>Return Volatility (std dev %)</label>
+      <div class="input-row">
+        <input type="range" id="r_mc_vol" min="2" max="20" step="1" value="8">
+        <span class="val-display" id="v_mc_vol">8%</span>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>Simulations</label>
+      <div class="input-row">
+        <input type="range" id="r_mc_n" min="100" max="2000" step="100" value="500">
+        <span class="val-display" id="v_mc_n">500</span>
+      </div>
+    </div>
+    <button class="run-btn" onclick="runMonteCarlo()">⚡ Run Monte Carlo</button>
+    <div class="mc-info" id="mc_result">Click the button to run probability analysis on your FIRE plan.</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main>
+
+  <!-- Scenario buttons -->
+  <div class="scenario-row">
+    <button class="scenario-btn active" onclick="applyScenario('base',this)">Base Case</button>
+    <button class="scenario-btn" onclick="applyScenario('optimistic',this)">Optimistic 🚀</button>
+    <button class="scenario-btn" onclick="applyScenario('conservative',this)">Conservative 🛡️</button>
+    <button class="scenario-btn" onclick="applyScenario('fire_early',this)">FIRE Early (38)</button>
+    <button class="scenario-btn" onclick="applyScenario('fire_late',this)">FIRE Late (45)</button>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid" id="kpi_grid">
+    <div class="kpi-card gold">
+      <div class="kpi-label">Corpus at FIRE</div>
+      <div class="kpi-value gold" id="kpi_fire_corpus">—</div>
+      <div class="kpi-sub" id="kpi_fire_year">—</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Final Networth (<span class="lbl-p2">Partner 2</span> 85)</div>
+      <div class="kpi-value blue" id="kpi_final_nw">—</div>
+      <div class="kpi-sub">Projected terminal wealth</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Years to FIRE</div>
+      <div class="kpi-value green" id="kpi_years_fire">—</div>
+      <div class="kpi-sub" id="kpi_fire_age_label">—</div>
+    </div>
+    <div class="kpi-card" style="border-top-color:var(--muted);">
+      <div class="kpi-label">Networth Runs Out</div>
+      <div class="kpi-value" id="kpi_nw_zero" style="font-size:1.2rem;">—</div>
+      <div class="kpi-sub" id="kpi_nw_zero_sub">Age when networth hits zero</div>
+    </div>
+    <div class="kpi-card fire">
+      <div class="kpi-label">Monthly Draw at Retirement</div>
+      <div class="kpi-value fire" id="kpi_monthly_draw">—</div>
+      <div class="kpi-sub">Inflation-adjusted, at FIRE year</div>
+    </div>
+    <div class="kpi-card blue" style="grid-column:span 2">
+      <div class="kpi-label">PF + NPS at FIRE (Locked Retirals)</div>
+      <div class="kpi-value blue" id="kpi_retiral_fire">—</div>
+      <div class="kpi-sub" id="kpi_retiral_breakdown">—</div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1 -->
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <div class="chart-title">Corpus Growth Over Time (₹ Crores)</div>
+      <canvas id="chart_corpus" class="tall"></canvas>
+    </div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Annual Cash Flow (₹ L)</div>
+      <canvas id="chart_cashflow"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Income vs Expenses Trajectory</div>
+      <canvas id="chart_income_exp"></canvas>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;">Year-by-Year Projection</div>
+      <span class="tooltip-pill">🔥 = FIRE year</span>
+    </div>
+    <div class="table-wrapper">
+      <table id="proj_table">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th><span class="lbl-p1">P1</span> / <span class="lbl-p2">P2</span> Age</th>
+            <th>Total Income (₹L)</th>
+            <th>Total Expenses (₹L)</th>
+            <th>Kids Cost (₹L)</th>
+            <th>One-Time (₹L)</th>
+            <th>PF+NPS Contrib (₹L)</th>
+            <th>Free Cash (₹L)</th>
+            <th>PF Vinod (₹Cr)</th>
+            <th>NPS Vinod (₹Cr)</th>
+            <th>PF Namrata (₹Cr)</th>
+            <th>NPS Namrata (₹Cr)</th>
+            <th>Total Retirals (₹Cr)</th>
+            <th>Free Corpus (₹Cr)</th>
+            <th>Networth (₹Cr)</th>
+          </tr>
+        </thead>
+        <tbody id="table_body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ─── Helpers ───────────────────────────────────────────────────────────────
+const fmt = (n, dec=2) => (n/1e7).toFixed(dec); // crores
+const fmtL = (n) => (n/1e5).toFixed(1); // lakhs
+const fmtCr = (n) => {
+  if(Math.abs(n)>=1e7) return (n/1e7).toFixed(2)+' Cr';
+  return (n/1e5).toFixed(1)+' L';
+};
+
+function getInputs() {
+  return {
+    p1_age: +document.getElementById('p1_age').value || 35,
+    p2_age: +document.getElementById('p2_age').value || 32,
+    namrata_raise: +document.getElementById('r_namrata_raise').value / 100,
+    vinod_raise:   +document.getElementById('r_vinod_raise').value / 100,
+    inflation:     +document.getElementById('r_inflation').value / 100,
+    roi:           +document.getElementById('r_roi').value / 100,
+    vinod_fire_age:+document.getElementById('r_vinod_fire').value,
+    namrata_fire_age:+document.getElementById('r_namrata_fire').value,
+    vinod_salary:  +document.getElementById('vinod_salary').value * 12,
+    vinod_bonus:   +document.getElementById('vinod_bonus').value,
+    namrata_salary:+document.getElementById('namrata_salary').value * 12,
+    namrata_bonus: +document.getElementById('namrata_bonus').value,
+    monthly_exp:   +document.getElementById('monthly_exp').value,
+    travel:        +document.getElementById('travel').value,
+    discretionary: +document.getElementById('discretionary').value,
+    corpus_start:  (+document.getElementById('corpus_vinod').value || 0) + (+document.getElementById('corpus_namrata').value || 0),
+    pf_vinod_bal:    +document.getElementById('pf_vinod_bal').value,
+    nps_vinod_bal:   +document.getElementById('nps_vinod_bal').value,
+    pf_namrata_bal:  +document.getElementById('pf_namrata_bal').value,
+    nps_namrata_bal: +document.getElementById('nps_namrata_bal').value,
+    pf_vinod_contrib:    +document.getElementById('pf_vinod_contrib').value,
+    nps_vinod_contrib:   +document.getElementById('nps_vinod_contrib').value,
+    pf_namrata_contrib:  +document.getElementById('pf_namrata_contrib').value,
+    nps_namrata_contrib: +document.getElementById('nps_namrata_contrib').value,
+    pf_rate:         +document.getElementById('r_pf_rate').value / 100,
+    nps_rate:        +document.getElementById('r_nps_rate').value / 100,
+    kid_inflation:   +document.getElementById('r_kid_inflation').value / 100,
+    kid1: {
+      enabled: document.getElementById('kid1_yes').classList.contains('active'),
+      namrata_age_at_birth: +document.getElementById('r_kid1_age').value,
+      base_cost:  +document.getElementById('kid1_cost').value,
+      school_extra: +document.getElementById('kid1_school').value,
+      college_lump: +document.getElementById('kid1_college').value,
+    },
+    kid2: {
+      enabled: document.getElementById('kid2_yes').classList.contains('active'),
+      namrata_age_at_birth: +document.getElementById('r_kid2_age').value,
+      base_cost:  +document.getElementById('kid2_cost').value,
+      school_extra: +document.getElementById('kid2_school').value,
+      college_lump: +document.getElementById('kid2_college').value,
+    },
+    ot: readOTItems(),
+  };
+}
+
+function simulate(inp, returnVariance=0) {
+  const START_YEAR = 2026;
+  const END_YEAR   = 2026 + (85 - inp.p2_age);  // Partner 2 age 85
+  const VINOD_AGE_2024 = inp.p1_age;
+  const NAMRATA_AGE_2024 = inp.p2_age;
+
+  let corpus = inp.corpus_start;
+
+  // Retirals: start from user-supplied current balances
+  let pf_vinod    = inp.pf_vinod_bal;
+  let nps_vinod   = inp.nps_vinod_bal;
+  let pf_namrata  = inp.pf_namrata_bal;
+  let nps_namrata = inp.nps_namrata_bal;
+
+  let rows = [];
+  let vinod_sal = inp.vinod_salary;
+  let vinod_bon = inp.vinod_bonus;
+  let namrata_sal = inp.namrata_salary;
+  let namrata_bon = inp.namrata_bonus;
+  let monthly_exp_base = inp.monthly_exp;
+  let travel_base = inp.travel;
+  let disc_base = inp.discretionary;
+
+  for(let yr = START_YEAR; yr <= END_YEAR; yr++) {
+    const t = yr - START_YEAR; // 0-indexed from 2024
+    const vinod_age   = VINOD_AGE_2024 + t;
+    const namrata_age = NAMRATA_AGE_2024 + t;
+
+    if(t > 0) {
+      vinod_sal *= (1 + inp.vinod_raise);
+      vinod_bon *= (1 + inp.vinod_raise);
+      namrata_sal *= (1 + inp.namrata_raise);
+      namrata_bon *= (1 + inp.namrata_raise);
+    }
+
+    const vinod_working   = vinod_age   < inp.vinod_fire_age;
+    const namrata_working = namrata_age < inp.namrata_fire_age;
+
+    const total_income = (vinod_working   ? vinod_sal   + vinod_bon   : 0)
+                       + (namrata_working ? namrata_sal + namrata_bon : 0);
+
+    // Expenses grow with inflation
+    const exp_factor = Math.pow(1 + inp.inflation, t);
+    const monthly_ann = monthly_exp_base * 12 * exp_factor;
+    const travel_yr   = travel_base * exp_factor;
+    const disc_yr     = disc_base * exp_factor;
+
+    // Kids cost — all inputs in 2026 ₹, inflated using child-specific inflation from 2026
+    // birth year derived from Namrata's birth year (1994) + her age at birth
+    const NAMRATA_BIRTH_YEAR = 2026 - inp.p2_age;
+    function kidCost(kid) {
+      if(!kid.enabled) return 0;
+      const birth_yr  = NAMRATA_BIRTH_YEAR + kid.namrata_age_at_birth;
+      const kid_age   = yr - birth_yr;
+      if(kid_age < 0 || kid_age > 22) return 0;
+      // years elapsed since 2026 to compound today's-value inputs to this year's value
+      const kid_inf_factor = Math.pow(1 + inp.kid_inflation, t);
+      let cost = kid.base_cost * kid_inf_factor;
+      if(kid_age >= 5 && kid_age <= 17) cost += kid.school_extra * kid_inf_factor;
+      if(kid_age === 18) cost += kid.college_lump * kid_inf_factor;
+      return cost;
+    }
+    const kid1_exp = kidCost(inp.kid1);
+    const kid2_exp = kidCost(inp.kid2);
+    const total_exp = monthly_ann + travel_yr + disc_yr + kid1_exp + kid2_exp;
+
+    // One-time outflows: each stored as {amount_2026, year, label}; inflate to payment year
+    const one_time = inp.ot
+      .filter(o => o.year === yr && o.amount > 0)
+      .reduce((sum, o) => {
+        const years_to_payment = o.year - 2026;
+        return sum + o.amount * Math.pow(1 + inp.inflation, years_to_payment);
+      }, 0);
+
+    // Free cash = income - expenses - one_time (retirals are NOT subtracted)
+    const free_cash = total_income - total_exp - one_time;
+
+    // Retirals: grow contributions year-on-year at salary raise rate, stop at FIRE
+    // t=0 is 2026, so contribution in year t = base_contrib * (1+raise)^t
+    const pf_vinod_contrib_yr   = vinod_working   ? inp.pf_vinod_contrib   * Math.pow(1 + inp.vinod_raise,   t) : 0;
+    const nps_vinod_contrib_yr  = vinod_working   ? inp.nps_vinod_contrib  * Math.pow(1 + inp.vinod_raise,   t) : 0;
+    const pf_namrata_contrib_yr = namrata_working ? inp.pf_namrata_contrib * Math.pow(1 + inp.namrata_raise, t) : 0;
+    const nps_namrata_contrib_yr= namrata_working ? inp.nps_namrata_contrib* Math.pow(1 + inp.namrata_raise, t) : 0;
+
+    pf_vinod    = pf_vinod    * (1 + inp.pf_rate)  + pf_vinod_contrib_yr;
+    nps_vinod   = nps_vinod   * (1 + inp.nps_rate) + nps_vinod_contrib_yr;
+    pf_namrata  = pf_namrata  * (1 + inp.pf_rate)  + pf_namrata_contrib_yr;
+    nps_namrata = nps_namrata * (1 + inp.nps_rate) + nps_namrata_contrib_yr;
+
+    const total_retiral_contrib = pf_vinod_contrib_yr + nps_vinod_contrib_yr + pf_namrata_contrib_yr + nps_namrata_contrib_yr;
+    const retiral = pf_vinod + nps_vinod + pf_namrata + nps_namrata;
+
+    // Apply return with optional variance
+    let ret = inp.roi;
+    if(returnVariance > 0) {
+      ret += (Math.random() * 2 - 1) * returnVariance;
+      ret = Math.max(-0.3, ret);
+    }
+
+    corpus = corpus * (1 + ret) + free_cash;
+
+    const one_time_labels = inp.ot.filter(o => o.year === yr && o.amount > 0).map(o => o.label).filter(Boolean);
+
+    rows.push({
+      year: yr,
+      vinod_age, namrata_age,
+      vinod_working, namrata_working,
+      total_income, total_exp, one_time, one_time_labels,
+      total_retiral_contrib,
+      kid1_exp, kid2_exp,
+      free_cash,
+      corpus,
+      pf_vinod, nps_vinod, pf_namrata, nps_namrata,
+      retiral,
+      networth: corpus + retiral,
+    });
+  }
+  return rows;
+}
+
+// ─── Charts ────────────────────────────────────────────────────────────────
+let charts = {};
+
+function initCharts() {
+  const defaults = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: { legend: { labels: { color: '#6b7a95', font: { family: 'DM Mono', size: 10 } } } },
+    scales: {
+      x: { ticks: { color: '#6b7a95', font: { family: 'DM Mono', size: 9 } }, grid: { color: 'rgba(37,45,61,0.8)' } },
+      y: { ticks: { color: '#6b7a95', font: { family: 'DM Mono', size: 9 } }, grid: { color: 'rgba(37,45,61,0.8)' } }
+    }
+  };
+
+  // Corpus chart
+  if(charts.corpus) charts.corpus.destroy();
+  charts.corpus = new Chart(document.getElementById('chart_corpus'), {
+    type: 'line',
+    data: { labels: [], datasets: [
+      { label: 'Free Corpus (₹Cr)', data: [], borderColor: '#f0b429', backgroundColor: 'rgba(240,180,41,0.07)', fill: true, tension: 0.4, pointRadius: 2 },
+      { label: 'Networth incl. Retirals (₹Cr)', data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.05)', fill: true, tension: 0.4, pointRadius: 2 },
+    ]},
+    options: { ...defaults, scales: { ...defaults.scales, y: { ...defaults.scales.y, ticks: { ...defaults.scales.y.ticks, callback: v => v.toFixed(0)+' Cr' } } } }
+  });
+
+  // Cash flow chart
+  if(charts.cashflow) charts.cashflow.destroy();
+  charts.cashflow = new Chart(document.getElementById('chart_cashflow'), {
+    type: 'bar',
+    data: { labels: [], datasets: [
+      { label: 'Free Cash (₹L)', data: [], backgroundColor: ctx => ctx.raw >= 0 ? 'rgba(52,211,153,0.7)' : 'rgba(248,113,113,0.7)', borderRadius: 3 }
+    ]},
+    options: { ...defaults, scales: { ...defaults.scales, y: { ...defaults.scales.y, ticks: { ...defaults.scales.y.ticks, callback: v => v.toFixed(0)+'L' } } } }
+  });
+
+  // Income vs Exp
+  if(charts.income_exp) charts.income_exp.destroy();
+  charts.income_exp = new Chart(document.getElementById('chart_income_exp'), {
+    type: 'line',
+    data: { labels: [], datasets: [
+      { label: 'Total Income (₹L)', data: [], borderColor: '#34d399', tension: 0.4, pointRadius: 2 },
+      { label: 'Total Expenses (₹L)', data: [], borderColor: '#f87171', tension: 0.4, pointRadius: 2, borderDash: [4,3] }
+    ]},
+    options: defaults
+  });
+}
+
+function updateCharts(rows) {
+  const labels = rows.map(r => r.year);
+  const corpus_cr   = rows.map(r => +(r.corpus/1e7).toFixed(2));
+  const nw_cr       = rows.map(r => +(r.networth/1e7).toFixed(2));
+  const free_L      = rows.map(r => +(r.free_cash/1e5).toFixed(1));
+  const income_L    = rows.map(r => +(r.total_income/1e5).toFixed(1));
+  const exp_L       = rows.map(r => +(r.total_exp/1e5).toFixed(1));
+
+  charts.corpus.data.labels = labels;
+  charts.corpus.data.datasets[0].data = corpus_cr;
+  charts.corpus.data.datasets[1].data = nw_cr;
+  charts.corpus.update();
+
+  charts.cashflow.data.labels = labels;
+  charts.cashflow.data.datasets[0].data = free_L;
+  charts.cashflow.update();
+
+  charts.income_exp.data.labels = labels;
+  charts.income_exp.data.datasets[0].data = income_L;
+  charts.income_exp.data.datasets[1].data = exp_L;
+  charts.income_exp.update();
+}
+
+// ─── KPI update ────────────────────────────────────────────────────────────
+function updateKPIs(rows, inp) {
+  // FIRE year = first year BOTH are retired
+  const fire_row = rows.find(r => !r.vinod_working && !r.namrata_working);
+  if(fire_row) {
+    document.getElementById('kpi_fire_corpus').textContent = (fire_row.corpus/1e7).toFixed(2)+' Cr';
+    document.getElementById('kpi_fire_year').textContent   = `Year ${fire_row.year} — ${p1()} ${fire_row.vinod_age}, ${p2()} ${fire_row.namrata_age}`;
+    document.getElementById('kpi_years_fire').textContent  = fire_row.year - 2026 + ' yrs';
+    document.getElementById('kpi_fire_age_label').textContent = `from 2026`;
+    const monthly_draw = fire_row.total_exp / 12;
+    document.getElementById('kpi_monthly_draw').textContent = '₹' + (monthly_draw/1e5).toFixed(1)+'L/mo';
+    document.getElementById('kpi_retiral_fire').textContent = (fire_row.retiral/1e7).toFixed(2)+' Cr';
+    document.getElementById('kpi_retiral_breakdown').textContent =
+      `PF: ₹${(( fire_row.pf_vinod+fire_row.pf_namrata)/1e7).toFixed(2)}Cr  |  NPS: ₹${((fire_row.nps_vinod+fire_row.nps_namrata)/1e7).toFixed(2)}Cr`;
+  }
+
+  const last = rows[rows.length-1];
+  document.getElementById('kpi_final_nw').textContent = (last.networth/1e7).toFixed(2)+' Cr';
+
+  // Find first year networth goes negative
+  const zero_row = rows.find(r => r.networth <= 0);
+  const nwEl    = document.getElementById('kpi_nw_zero');
+  const nwSubEl = document.getElementById('kpi_nw_zero_sub');
+  if(zero_row) {
+    nwEl.textContent    = `${p1()}:${zero_row.vinod_age} / ${p2()}:${zero_row.namrata_age}`;
+    nwEl.style.color    = 'var(--danger)';
+    nwSubEl.textContent = `Year ${zero_row.year} — plan needs revision`;
+    nwSubEl.style.color = 'var(--danger)';
+  } else {
+    nwEl.textContent    = 'Never ✓';
+    nwEl.style.color    = 'var(--accent3)';
+    nwSubEl.textContent = `Survives past ${p2()} age 85`;
+    nwSubEl.style.color = '';
+  }
+}
+
+// ─── Table update ──────────────────────────────────────────────────────────
+function updateTable(rows, inp) {
+  const fire_row = rows.find(r => !r.vinod_working && !r.namrata_working);
+  const fire_year = fire_row ? fire_row.year : 9999;
+
+  const tbody = document.getElementById('table_body');
+  tbody.innerHTML = rows.map(r => {
+    const is_fire = r.year === fire_year;
+    const fc_class = r.free_cash >= 0 ? 'positive' : 'negative';
+    const kids_total = r.kid1_exp + r.kid2_exp;
+    const kid_label = kids_total > 0 ? `<span style="color:var(--fire)">${fmtL(kids_total)}</span>` : `<span style="color:var(--muted)">—</span>`;
+    const ot_label = r.one_time > 0
+      ? `<span style="color:var(--danger)" title="${r.one_time_labels.join(', ')}">${fmtL(r.one_time)}${r.one_time_labels.length ? ' · '+r.one_time_labels.join(', ') : ''}</span>`
+      : `<span style="color:var(--muted)">—</span>`;
+    return `<tr class="${is_fire?'fire-year':''}">
+      <td>${is_fire?'🔥 ':''}${r.year}</td>
+      <td>${r.vinod_age} / ${r.namrata_age}</td>
+      <td>${fmtL(r.total_income)}</td>
+      <td>${fmtL(r.total_exp)}</td>
+      <td>${kid_label}</td>
+      <td>${ot_label}</td>
+      <td style="color:var(--accent2)">${r.total_retiral_contrib > 0 ? fmtL(r.total_retiral_contrib) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td class="${fc_class}">${fmtL(r.free_cash)}</td>
+      <td style="color:var(--accent2)">${(r.pf_vinod/1e7).toFixed(2)}</td>
+      <td style="color:var(--accent2)">${(r.nps_vinod/1e7).toFixed(2)}</td>
+      <td style="color:var(--accent3)">${(r.pf_namrata/1e7).toFixed(2)}</td>
+      <td style="color:var(--accent3)">${(r.nps_namrata/1e7).toFixed(2)}</td>
+      <td style="color:var(--muted)">${(r.retiral/1e7).toFixed(2)}</td>
+      <td style="color:var(--accent)">${(r.corpus/1e7).toFixed(2)}</td>
+      <td>${(r.networth/1e7).toFixed(2)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── Main refresh ──────────────────────────────────────────────────────────
+function refresh() {
+  const inp = getInputs();
+  const rows = simulate(inp);
+  updateKPIs(rows, inp);
+  updateCharts(rows);
+  updateTable(rows, inp);
+}
+
+// ─── Monte Carlo ───────────────────────────────────────────────────────────
+function runMonteCarlo() {
+  const inp = getInputs();
+  const n = +document.getElementById('r_mc_n').value;
+  const vol = +document.getElementById('r_mc_vol').value / 100;
+
+  let success = 0;
+  let final_corpus_all = [];
+
+  for(let i=0;i<n;i++) {
+    const rows = simulate(inp, vol);
+    const final = rows[rows.length-1].corpus;
+    final_corpus_all.push(final);
+    if(final > 0) success++;
+  }
+
+  final_corpus_all.sort((a,b)=>a-b);
+  const p10 = final_corpus_all[Math.floor(n*0.1)];
+  const p50 = final_corpus_all[Math.floor(n*0.5)];
+  const p90 = final_corpus_all[Math.floor(n*0.9)];
+
+  const pct = ((success/n)*100).toFixed(1);
+  document.getElementById('mc_result').innerHTML = `
+    <strong>Success Rate:</strong> ${pct}% (positive corpus at 83)<br>
+    <strong>P10 Outcome:</strong> ₹${(p10/1e7).toFixed(1)} Cr (bad scenario)<br>
+    <strong>P50 Outcome:</strong> ₹${(p50/1e7).toFixed(1)} Cr (median)<br>
+    <strong>P90 Outcome:</strong> ₹${(p90/1e7).toFixed(1)} Cr (best scenario)<br>
+    <small style="color:#4a5568">Based on ${n} simulations with ±${(vol*100).toFixed(0)}% annual return volatility</small>
+  `;
+}
+
+// ─── Scenarios ─────────────────────────────────────────────────────────────
+function applyScenario(name, btn) {
+  document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const scenarios = {
+    base:        { r_roi: 11, r_inflation: 8, r_vinod_fire: 42, r_namrata_fire: 42 },
+    optimistic:  { r_roi: 14, r_inflation: 6, r_vinod_fire: 40, r_namrata_fire: 40 },
+    conservative:{ r_roi: 8,  r_inflation: 10, r_vinod_fire: 45, r_namrata_fire: 45 },
+    fire_early:  { r_roi: 11, r_inflation: 8, r_vinod_fire: 38, r_namrata_fire: 38 },
+    fire_late:   { r_roi: 11, r_inflation: 8, r_vinod_fire: 47, r_namrata_fire: 47 },
+  };
+
+  const s = scenarios[name];
+  for(const [k,v] of Object.entries(s)) {
+    const el = document.getElementById(k);
+    if(el) { el.value = v; el.dispatchEvent(new Event('input')); }
+  }
+  refresh();
+}
+
+// ─── Slider live labels ─────────────────────────────────────────────────────
+function bindSlider(sliderId, labelId, suffix='%', scale=1) {
+  const sl = document.getElementById(sliderId);
+  const lb = document.getElementById(labelId);
+  if(!sl || !lb) return;
+  sl.addEventListener('input', () => {
+    lb.textContent = (sl.value * scale).toFixed(suffix==='%'?1:0) + suffix;
+    refresh();
+  });
+}
+
+// ─── One-Time Outflows management ──────────────────────────────────────────
+const OT_DEFAULTS = [];
+
+let otIdCounter = 0;
+
+function addOTRow(data = {}) {
+  const list = document.getElementById('ot_list');
+  if(!list || list.children.length >= 10) return;
+  const id = ++otIdCounter;
+  const label  = data.label  || '';
+  const amount = data.amount != null ? data.amount : '';
+  const year   = data.year   || 2030;
+  const div = document.createElement('div');
+  div.className = 'ot-row';
+  div.id = `ot_row_${id}`;
+  div.innerHTML = `
+    <div class="ot-row-top">
+      <input class="ot-label-input" placeholder="Expense label…" value="${label}" oninput="refresh()">
+      <button class="ot-del-btn" onclick="removeOTRow(${id})" title="Remove">✕</button>
+    </div>
+    <div class="ot-row-bottom">
+      <div class="ot-field">
+        <label>2026 ₹ Amount</label>
+        <input type="number" value="${amount}" step="100000" placeholder="e.g. 1000000" oninput="refresh()">
+      </div>
+      <div class="ot-field">
+        <label>Year of Payment</label>
+        <input type="number" value="${year}" min="2026" max="2076" step="1" oninput="refresh()">
+      </div>
+    </div>`;
+  list.appendChild(div);
+  // do NOT call refresh() here — called once at init after all rows are seeded
+}
+
+function removeOTRow(id) {
+  const el = document.getElementById(`ot_row_${id}`);
+  if(el) el.remove();
+  refresh();
+}
+
+function readOTItems() {
+  return Array.from(document.querySelectorAll('.ot-row')).map(row => {
+    const inputs = row.querySelectorAll('input');
+    return {
+      label:  inputs[0].value.trim(),
+      amount: parseFloat(inputs[1].value) || 0,
+      year:   parseInt(inputs[2].value)   || 0,
+    };
+  }).filter(o => o.amount > 0 && o.year >= 2026);
+}
+
+function toggleKid(n, choice) {
+  const yes = document.getElementById(`kid${n}_yes`);
+  const no  = document.getElementById(`kid${n}_no`);
+  const inputs = document.getElementById(`kid${n}_inputs`);
+  if(choice === 'yes') {
+    yes.classList.add('active'); no.classList.remove('active');
+    inputs.style.display = 'block';
+  } else {
+    no.classList.add('active'); yes.classList.remove('active');
+    inputs.style.display = 'none';
+  }
+  refresh();
+}
+
+// ─── Name helpers ───────────────────────────────────────────────────────────
+function p1() { const v = document.getElementById('p1_name').value.trim(); return v || 'Partner 1'; }
+function p2() { const v = document.getElementById('p2_name').value.trim(); return v || 'Partner 2'; }
+
+function updateNames() {
+  const n1 = p1(), n2 = p2();
+  const a1 = +document.getElementById('p1_age').value || 35;
+  const a2 = +document.getElementById('p2_age').value || 32;
+
+  // Update all lbl-p1 / lbl-p2 spans
+  document.querySelectorAll('.lbl-p1').forEach(el => el.textContent = n1);
+  document.querySelectorAll('.lbl-p2').forEach(el => el.textContent = n2);
+
+  // Update header subtitle
+  document.getElementById('header_subtitle').textContent = `${n1} & ${n2} — Financial Independence Simulation`;
+
+  // Update current age hints on FIRE sliders
+  const ca1 = document.getElementById('lbl_p1_cur_age');
+  const ca2 = document.getElementById('lbl_p2_cur_age');
+  if(ca1) ca1.textContent = `(currently ${a1})`;
+  if(ca2) ca2.textContent = `(currently ${a2})`;
+
+  refresh();
+}
+
+// ─── Init — everything defined above, now execute ──────────────────────────
+bindSlider('r_namrata_raise','v_namrata_raise','%');
+bindSlider('r_vinod_raise','v_vinod_raise','%');
+bindSlider('r_inflation','v_inflation','%');
+bindSlider('r_roi','v_roi','%');
+bindSlider('r_vinod_fire','v_vinod_fire','');
+bindSlider('r_namrata_fire','v_namrata_fire','');
+bindSlider('r_mc_vol','v_mc_vol','%');
+bindSlider('r_mc_n','v_mc_n','');
+bindSlider('r_pf_rate','v_pf_rate','%');
+bindSlider('r_nps_rate','v_nps_rate','%');
+bindSlider('r_kid1_age','v_kid1_age','');
+bindSlider('r_kid2_age','v_kid2_age','');
+bindSlider('r_kid_inflation','v_kid_inflation','%');
+
+['vinod_salary','vinod_bonus','namrata_salary','namrata_bonus',
+ 'monthly_exp','travel','discretionary','corpus_vinod','corpus_namrata',
+ 'pf_vinod_bal','nps_vinod_bal','pf_namrata_bal','nps_namrata_bal',
+ 'pf_vinod_contrib','nps_vinod_contrib','pf_namrata_contrib','nps_namrata_contrib',
+ 'kid1_cost','kid1_school','kid1_college',
+ 'kid2_cost','kid2_school','kid2_college'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('input', refresh);
+});
+
+OT_DEFAULTS.forEach(d => addOTRow(d));
+initCharts();
+document.getElementById('p1_name').addEventListener('input', updateNames);
+document.getElementById('p2_name').addEventListener('input', updateNames);
+document.getElementById('p1_age').addEventListener('input', updateNames);
+document.getElementById('p2_age').addEventListener('input', updateNames);
+updateNames();
+</script>
+</body>
+</html>
