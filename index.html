@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Couple Financial Planning Tool</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&amp;family=DM+Mono:wght@300;400;500&amp;family=DM+Sans:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 
 <!-- Google Analytics -->
@@ -86,9 +87,12 @@
     font-family: 'DM Mono', monospace;
     font-size: 0.88rem; letter-spacing: 0.12em;
     color: var(--accent); text-transform: uppercase;
-    margin-bottom: 16px;
+    margin-bottom: 0;
     display: flex; align-items: center; gap: 10px;
     white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    padding: 6px 0;
   }
   .section-title::after {
     content: '';
@@ -96,6 +100,23 @@
     height: 1px;
     background: linear-gradient(to right, var(--accent), transparent);
     opacity: 0.5;
+  }
+  .section-title .chev {
+    font-size: 0.65rem; margin-left: 2px;
+    transition: transform 0.2s;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .section-title.open .chev { transform: rotate(180deg); }
+  .section-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease, margin-top 0.2s ease;
+    margin-top: 0;
+  }
+  .section-body.open {
+    max-height: 2000px;
+    margin-top: 14px;
   }
   .input-group { margin-bottom: 18px; }
   .input-group label {
@@ -324,437 +345,465 @@
 </style>
 </head>
 <body>
-
 <header>
-  <div>
-    <h1>Couple<span>.</span> Financial Planner</h1>
-    <div class="subtitle" id="header_subtitle">Financial Independence Simulation</div>
-  </div>
-  <div class="fire-badge">💑 Plan Together</div>
+<div>
+<h1>Couple<span>.</span> Financial Planner</h1>
+<div class="subtitle" id="header_subtitle">Financial Independence Simulation</div>
+</div>
+<div class="fire-badge">💑 Plan Together</div>
 </header>
-
 <div class="layout">
-
 <!-- SIDEBAR -->
 <aside>
-  <div class="sidebar-section">
-    <div class="section-title">👥 People</div>
-    <div class="one-time-row">
-      <div>
-        <label>Partner 1 Name</label>
-        <input type="text" id="p1_name" value="" placeholder="e.g. Arjun" class="ot-label-input" style="border:1px solid var(--border);border-radius:5px;padding:6px 8px;width:100%;background:var(--surface2);">
-      </div>
-      <div>
-        <label>Current Age</label>
-        <input type="number" id="p1_age" value="" min="20" max="60" style="width:100%" placeholder="Age">
-      </div>
-    </div>
-    <div class="one-time-row" style="margin-top:8px">
-      <div>
-        <label>Partner 2 Name</label>
-        <input type="text" id="p2_name" value="" placeholder="e.g. Priya" class="ot-label-input" style="border:1px solid var(--border);border-radius:5px;padding:6px 8px;width:100%;background:var(--surface2);">
-      </div>
-      <div>
-        <label>Current Age</label>
-        <input type="number" id="p2_age" value="" min="20" max="60" style="width:100%" placeholder="Age">
-      </div>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-title">📈 Growth Rates</div>
-    <div class="input-group">
-      <label><span class="lbl-p2">Partner 2</span> Salary Growth</label>
-      <div class="input-row">
-        <input type="range" id="r_namrata_raise" min="1" max="20" step="0.5" value="5">
-        <span class="val-display" id="v_namrata_raise">5.0%</span>
-      </div>
-    </div>
-    <div class="input-group">
-      <label><span class="lbl-p1">Partner 1</span> Salary Growth</label>
-      <div class="input-row">
-        <input type="range" id="r_vinod_raise" min="1" max="20" step="0.5" value="4">
-        <span class="val-display" id="v_vinod_raise">4.0%</span>
-      </div>
-    </div>
-    <div class="input-group">
-      <label>Expenditure Inflation</label>
-      <div class="input-row">
-        <input type="range" id="r_inflation" min="4" max="15" step="0.5" value="8">
-        <span class="val-display" id="v_inflation">8.0%</span>
-      </div>
-    </div>
-    <div class="input-group">
-      <label>Yearly Investment Return</label>
-      <div class="input-row">
-        <input type="range" id="r_roi" min="6" max="18" step="0.5" value="11">
-        <span class="val-display" id="v_roi">11.0%</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-title">💰 Starting Values (₹)</div>
-    <div class="input-group">
-      <label><span class="lbl-p1">Partner 1</span> Monthly Take-Home (2026)</label>
-      <input type="number" id="vinod_salary" value="" step="5000" placeholder="e.g. 300000">
-    </div>
-    <div class="input-group">
-      <label><span class="lbl-p1">Partner 1</span> Annual Bonus (2026)</label>
-      <input type="number" id="vinod_bonus" value="" step="50000" placeholder="e.g. 700000">
-    </div>
-    <div class="input-group">
-      <label><span class="lbl-p2">Partner 2</span> Monthly Take-Home (2026)</label>
-      <input type="number" id="namrata_salary" value="" step="5000" placeholder="e.g. 290000">
-    </div>
-    <div class="input-group">
-      <label><span class="lbl-p2">Partner 2</span> Annual Bonus (2026)</label>
-      <input type="number" id="namrata_bonus" value="" step="50000" placeholder="e.g. 1800000">
-    </div>
-    <div class="input-group">
-      <label>Monthly Expenses — Working Years (₹/month, 2026 ₹)</label>
-      <input type="number" id="monthly_exp" value="" step="5000" placeholder="e.g. 120000">
-    </div>
-    <div class="input-group">
-      <label>Monthly Expenses — Post Retirement (₹/month, 2026 ₹)</label>
-      <input type="number" id="monthly_exp_post" value="" step="5000" placeholder="e.g. 80000">
-    </div>
-    <div class="input-group">
-      <label>Yearly Travel Budget (₹)</label>
-      <input type="number" id="travel" value="" step="10000" placeholder="e.g. 400000">
-    </div>
-    <div class="input-group">
-      <label>Discretionary Expenses (₹)</label>
-      <input type="number" id="discretionary" value="" step="10000" placeholder="e.g. 500000">
-    </div>
-    <div class="input-group">
-      <label><span class="lbl-p1">Partner 1</span> Starting Corpus (₹)</label>
-      <input type="number" id="corpus_vinod" value="" step="100000" placeholder="e.g. 5000000">
-    </div>
-    <div class="input-group">
-      <label><span class="lbl-p2">Partner 2</span> Starting Corpus (₹)</label>
-      <input type="number" id="corpus_namrata" value="" step="100000" placeholder="e.g. 3000000">
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-title">🏦 Retirals — <span class="lbl-p1">Partner 1</span> (2026 ₹)</div>
-    <div class="one-time-row">
-      <div>
-        <label>PF Balance</label>
-        <input type="number" id="pf_vinod_bal" value="" step="100000" placeholder="0">
-      </div>
-      <div>
-        <label>NPS Balance</label>
-        <input type="number" id="nps_vinod_bal" value="" step="50000" placeholder="0">
-      </div>
-    </div>
-    <div class="one-time-row" style="margin-top:10px">
-      <div>
-        <label>PF Contrib / yr (₹)</label>
-        <input type="number" id="pf_vinod_contrib" value="" step="10000" placeholder="0">
-      </div>
-      <div>
-        <label>NPS Contrib / yr (₹)</label>
-        <input type="number" id="nps_vinod_contrib" value="" step="10000" placeholder="0">
-      </div>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-title">🏦 Retirals — <span class="lbl-p2">Partner 2</span> (2026 ₹)</div>
-    <div class="one-time-row">
-      <div>
-        <label>PF Balance</label>
-        <input type="number" id="pf_namrata_bal" value="" step="100000" placeholder="0">
-      </div>
-      <div>
-        <label>NPS Balance</label>
-        <input type="number" id="nps_namrata_bal" value="" step="50000" placeholder="0">
-      </div>
-    </div>
-    <div class="one-time-row" style="margin-top:10px">
-      <div>
-        <label>PF Contrib / yr (₹)</label>
-        <input type="number" id="pf_namrata_contrib" value="" step="10000" placeholder="0">
-      </div>
-      <div>
-        <label>NPS Contrib / yr (₹)</label>
-        <input type="number" id="nps_namrata_contrib" value="" step="10000" placeholder="0">
-      </div>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-title">📊 Retiral Growth Rates</div>
-    <div class="input-group">
-      <label>PF Interest Rate (EPFO)</label>
-      <div class="input-row">
-        <input type="range" id="r_pf_rate" min="7" max="10" step="0.1" value="8.5">
-        <span class="val-display" id="v_pf_rate">8.5%</span>
-      </div>
-    </div>
-    <div class="input-group">
-      <label>NPS Return Rate</label>
-      <div class="input-row">
-        <input type="range" id="r_nps_rate" min="8" max="14" step="0.5" value="10">
-        <span class="val-display" id="v_nps_rate">10.0%</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-title">🎯 FIRE Target Ages</div>
-    <div class="input-group">
-      <label><span class="lbl-p1">Partner 1</span> FIRE Age <span id="lbl_p1_cur_age" style="color:var(--muted)">(currently 35)</span></label>
-      <div class="input-row">
-        <input type="range" id="r_vinod_fire" min="38" max="55" step="1" value="42">
-        <span class="val-display" id="v_vinod_fire">42</span>
-      </div>
-    </div>
-    <div class="input-group">
-      <label><span class="lbl-p2">Partner 2</span> FIRE Age <span id="lbl_p2_cur_age" style="color:var(--muted)">(currently 32)</span></label>
-      <div class="input-row">
-        <input type="range" id="r_namrata_fire" min="35" max="55" step="1" value="42">
-        <span class="val-display" id="v_namrata_fire">42</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-title">👶 Kids Planning</div>
-
-    <div class="input-group">
-      <label>Children Expense Inflation <span style="color:var(--fire);font-size:0.68rem;">(independent rate)</span></label>
-      <div class="input-row">
-        <input type="range" id="r_kid_inflation" min="8" max="20" step="0.5" value="12">
-        <span class="val-display" id="v_kid_inflation">12.0%</span>
-      </div>
-      <div style="font-size:0.65rem;color:var(--muted);margin-top:4px;">All kid costs entered in <strong style="color:var(--accent)">2026 ₹</strong> — inflated using this rate</div>
-    </div>
-
-    <!-- Kid 1 -->
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <span style="font-size:0.78rem;color:var(--text);font-weight:500;">👶 Kid 1</span>
-        <div style="display:flex;gap:6px;">
-          <button class="kid-toggle" id="kid1_yes" onclick="toggleKid(1,'yes')">Yes</button>
-          <button class="kid-toggle active" id="kid1_no" onclick="toggleKid(1,'no')">No</button>
-        </div>
-      </div>
-      <div id="kid1_inputs" style="display:none;">
-        <!-- Existing or planned -->
-        <div style="display:flex;gap:6px;margin-bottom:12px;">
-          <button class="kid-toggle" id="kid1_existing" onclick="toggleKidType(1,'existing')">Already have</button>
-          <button class="kid-toggle active" id="kid1_planned" onclick="toggleKidType(1,'planned')">Planning</button>
-        </div>
-        <!-- Existing kid: current age -->
-        <div id="kid1_existing_inputs" style="display:none;">
-          <div class="input-group">
-            <label>Kid's current age (years)</label>
-            <input type="number" id="kid1_current_age" value="" min="0" max="17" step="1" placeholder="e.g. 5" oninput="refresh()">
-          </div>
-        </div>
-        <!-- Planned kid: P2 age at birth -->
-        <div id="kid1_planned_inputs">
-          <div class="input-group">
-            <label><span class="lbl-p2">Partner 2</span>'s age when born</label>
-            <div class="input-row">
-              <input type="range" id="r_kid1_age" min="30" max="40" step="1" value="33">
-              <span class="val-display" id="v_kid1_age">33</span>
-            </div>
-          </div>
-        </div>
-        <div class="input-group">
-          <label>Annual base cost — 2026 ₹ (₹/yr)</label>
-          <input type="number" id="kid1_cost" value="" step="25000" placeholder="e.g. 300000">
-        </div>
-        <div class="input-group">
-          <label>School fees — 2026 ₹ (age 5–17, ₹/yr extra)</label>
-          <input type="number" id="kid1_school" value="" step="25000" placeholder="e.g. 250000">
-        </div>
-        <div class="input-group">
-          <label>College lump sum — 2026 ₹ (at age 18, ₹)</label>
-          <input type="number" id="kid1_college" value="" step="100000" placeholder="e.g. 2000000">
-        </div>
-      </div>
-    </div>
-
-    <!-- Kid 2 -->
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <span style="font-size:0.78rem;color:var(--text);font-weight:500;">👶 Kid 2</span>
-        <div style="display:flex;gap:6px;">
-          <button class="kid-toggle" id="kid2_yes" onclick="toggleKid(2,'yes')">Yes</button>
-          <button class="kid-toggle active" id="kid2_no" onclick="toggleKid(2,'no')">No</button>
-        </div>
-      </div>
-      <div id="kid2_inputs" style="display:none;">
-        <!-- Existing or planned -->
-        <div style="display:flex;gap:6px;margin-bottom:12px;">
-          <button class="kid-toggle" id="kid2_existing" onclick="toggleKidType(2,'existing')">Already have</button>
-          <button class="kid-toggle active" id="kid2_planned" onclick="toggleKidType(2,'planned')">Planning</button>
-        </div>
-        <!-- Existing kid: current age -->
-        <div id="kid2_existing_inputs" style="display:none;">
-          <div class="input-group">
-            <label>Kid's current age (years)</label>
-            <input type="number" id="kid2_current_age" value="" min="0" max="17" step="1" placeholder="e.g. 2" oninput="refresh()">
-          </div>
-        </div>
-        <!-- Planned kid: P2 age at birth -->
-        <div id="kid2_planned_inputs">
-          <div class="input-group">
-            <label><span class="lbl-p2">Partner 2</span>'s age when born</label>
-            <div class="input-row">
-              <input type="range" id="r_kid2_age" min="30" max="42" step="1" value="36">
-              <span class="val-display" id="v_kid2_age">36</span>
-            </div>
-          </div>
-        </div>
-        <div class="input-group">
-          <label>Annual base cost — 2026 ₹ (₹/yr)</label>
-          <input type="number" id="kid2_cost" value="" step="25000" placeholder="e.g. 300000">
-        </div>
-        <div class="input-group">
-          <label>School fees — 2026 ₹ (age 5–17, ₹/yr extra)</label>
-          <input type="number" id="kid2_school" value="" step="25000" placeholder="e.g. 250000">
-        </div>
-        <div class="input-group">
-          <label>College lump sum — 2026 ₹ (at age 18, ₹)</label>
-          <input type="number" id="kid2_college" value="" step="100000" placeholder="e.g. 2000000">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-title">💸 One-Time Outflows</div>
-    <div style="font-size:0.65rem;color:var(--muted);margin-bottom:12px;">Enter in <strong style="color:var(--accent)">today's 2026 ₹</strong> — inflated to payment year using Expenditure Inflation rate</div>
-    <div id="ot_list"></div>
-    <button onclick="addOTRow()" style="width:100%;margin-top:8px;padding:7px;background:transparent;border:1px dashed var(--border);border-radius:6px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">+ Add Expense</button>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-title">🎲 Monte Carlo</div>
-    <div class="input-group">
-      <label>Return Volatility (std dev %)</label>
-      <div class="input-row">
-        <input type="range" id="r_mc_vol" min="2" max="20" step="1" value="8">
-        <span class="val-display" id="v_mc_vol">8%</span>
-      </div>
-    </div>
-    <div class="input-group">
-      <label>Simulations</label>
-      <div class="input-row">
-        <input type="range" id="r_mc_n" min="100" max="5000" step="100" value="500">
-        <span class="val-display" id="v_mc_n">500</span>
-      </div>
-    </div>
-    <button class="run-btn" onclick="runMonteCarlo()">⚡ Run Monte Carlo</button>
-    <div class="mc-info" id="mc_result">Click the button to run probability analysis on your FIRE plan.</div>
-  </div>
+<div class="sidebar-section">
+<div class="section-title">👥 People</div>
+<div class="one-time-row">
+<div>
+<label>Partner 1 Name</label>
+<input class="ot-label-input" id="p1_name" placeholder="e.g. Arjun" style="border:1px solid var(--border);border-radius:5px;padding:6px 8px;width:100%;background:var(--surface2);" type="text" value=""/>
+</div>
+<div>
+<label>Current Age</label>
+<input id="p1_age" max="60" min="20" placeholder="Age" style="width:100%" type="number" value=""/>
+</div>
+</div>
+<div class="one-time-row" style="margin-top:8px">
+<div>
+<label>Partner 2 Name</label>
+<input class="ot-label-input" id="p2_name" placeholder="e.g. Priya" style="border:1px solid var(--border);border-radius:5px;padding:6px 8px;width:100%;background:var(--surface2);" type="text" value=""/>
+</div>
+<div>
+<label>Current Age</label>
+<input id="p2_age" max="60" min="20" placeholder="Age" style="width:100%" type="number" value=""/>
+</div>
+</div>
+</div>
+<div class="sidebar-section">
+<div class="section-title" onclick="toggleSection(this)">💰 Income and Expenses <span class="chev">▼</span></div><div class="section-body">
+<div class="input-group">
+<label><span class="lbl-p1">Partner 1</span> Monthly Take-Home (2026)</label>
+<input id="vinod_salary" placeholder="e.g. 300000" step="5000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label><span class="lbl-p1">Partner 1</span> Annual Bonus (2026)</label>
+<input id="vinod_bonus" placeholder="e.g. 700000" step="50000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label><span class="lbl-p2">Partner 2</span> Monthly Take-Home (2026)</label>
+<input id="namrata_salary" placeholder="e.g. 290000" step="5000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label><span class="lbl-p2">Partner 2</span> Annual Bonus (2026)</label>
+<input id="namrata_bonus" placeholder="e.g. 1800000" step="50000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label>Monthly Expenses — Working Years (₹/month, 2026 ₹)</label>
+<input id="monthly_exp" placeholder="e.g. 120000" step="5000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label>Monthly Expenses — Post Retirement (₹/month, 2026 ₹)</label>
+<input id="monthly_exp_post" placeholder="e.g. 80000" step="5000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label>Yearly Travel Budget (₹)</label>
+<input id="travel" placeholder="e.g. 400000" step="10000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label>Discretionary Expenses (₹)</label>
+<input id="discretionary" placeholder="e.g. 500000" step="10000" type="number" value=""/>
+</div>
+</div></div>
+<div class="sidebar-section">
+<div class="section-title" onclick="toggleSection(this)">🏦 Current Corpus <span class="chev">▼</span></div><div class="section-body">
+<div class="input-group">
+<label><span class="lbl-p1">Partner 1</span> Starting Corpus (₹)</label>
+<input id="corpus_vinod" placeholder="e.g. 5000000" step="100000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label><span class="lbl-p2">Partner 2</span> Starting Corpus (₹)</label>
+<input id="corpus_namrata" placeholder="e.g. 3000000" step="100000" type="number" value=""/>
+</div>
+</div></div>
+<div class="sidebar-section">
+<div class="section-title" onclick="toggleSection(this)">📈 Growth Rates <span class="chev">▼</span></div><div class="section-body">
+<div class="input-group">
+<label><span class="lbl-p2">Partner 2</span> Salary Growth</label>
+<div class="input-row">
+<input id="r_namrata_raise" max="20" min="1" step="0.5" type="range" value="5"/>
+<span class="val-display" id="v_namrata_raise">5.0%</span>
+</div>
+</div>
+<div class="input-group">
+<label><span class="lbl-p1">Partner 1</span> Salary Growth</label>
+<div class="input-row">
+<input id="r_vinod_raise" max="20" min="1" step="0.5" type="range" value="4"/>
+<span class="val-display" id="v_vinod_raise">4.0%</span>
+</div>
+</div>
+<div class="input-group">
+<label>Expenditure Inflation</label>
+<div class="input-row">
+<input id="r_inflation" max="15" min="4" step="0.5" type="range" value="8"/>
+<span class="val-display" id="v_inflation">8.0%</span>
+</div>
+</div>
+<div class="input-group">
+<label>Yearly Investment Return</label>
+<div class="input-row">
+<input id="r_roi" max="18" min="6" step="0.5" type="range" value="11"/>
+<span class="val-display" id="v_roi">11.0%</span>
+</div>
+</div>
+</div></div>
+<div class="sidebar-section">
+<div class="section-title" onclick="toggleSection(this)">🏦 Retirals <span class="chev">▼</span></div><div class="section-body">
+<div style="font-size:0.72rem;color:var(--accent2);font-family:'DM Mono',monospace;margin-bottom:8px;"><span class="lbl-p1">Partner 1</span></div>
+<div class="one-time-row">
+<div>
+<label>PF Balance</label>
+<input id="pf_vinod_bal" placeholder="0" step="100000" type="number" value=""/>
+</div>
+<div>
+<label>NPS Balance</label>
+<input id="nps_vinod_bal" placeholder="0" step="50000" type="number" value=""/>
+</div>
+</div>
+<div class="one-time-row" style="margin-top:10px">
+<div>
+<label>PF Contrib / yr (₹)</label>
+<input id="pf_vinod_contrib" placeholder="0" step="10000" type="number" value=""/>
+</div>
+<div>
+<label>NPS Contrib / yr (₹)</label>
+<input id="nps_vinod_contrib" placeholder="0" step="10000" type="number" value=""/>
+</div>
+</div>
+<div style="font-size:0.72rem;color:var(--accent2);font-family:'DM Mono',monospace;margin-top:16px;margin-bottom:8px;"><span class="lbl-p2">Partner 2</span></div>
+<div class="one-time-row">
+<div>
+<label>PF Balance</label>
+<input id="pf_namrata_bal" placeholder="0" step="100000" type="number" value=""/>
+</div>
+<div>
+<label>NPS Balance</label>
+<input id="nps_namrata_bal" placeholder="0" step="50000" type="number" value=""/>
+</div>
+</div>
+<div class="one-time-row" style="margin-top:10px">
+<div>
+<label>PF Contrib / yr (₹)</label>
+<input id="pf_namrata_contrib" placeholder="0" step="10000" type="number" value=""/>
+</div>
+<div>
+<label>NPS Contrib / yr (₹)</label>
+<input id="nps_namrata_contrib" placeholder="0" step="10000" type="number" value=""/>
+</div>
+</div>
+<div style="height:1px;background:var(--border);margin:16px 0;"></div>
+<div class="input-group">
+<label>PF Interest Rate (EPFO)</label>
+<div class="input-row">
+<input id="r_pf_rate" max="10" min="7" step="0.1" type="range" value="8.5"/>
+<span class="val-display" id="v_pf_rate">8.5%</span>
+</div>
+</div>
+<div class="input-group">
+<label>NPS Return Rate</label>
+<div class="input-row">
+<input id="r_nps_rate" max="14" min="8" step="0.5" type="range" value="10"/>
+<span class="val-display" id="v_nps_rate">10.0%</span>
+</div>
+</div>
+</div></div>
+<div class="sidebar-section">
+<div class="section-title" onclick="toggleSection(this)">👶 Kids Planning <span class="chev">▼</span></div><div class="section-body">
+<div class="input-group">
+<label>Children Expense Inflation <span style="color:var(--fire);font-size:0.68rem;">(independent rate)</span></label>
+<div class="input-row">
+<input id="r_kid_inflation" max="20" min="8" step="0.5" type="range" value="12"/>
+<span class="val-display" id="v_kid_inflation">12.0%</span>
+</div>
+<div style="font-size:0.65rem;color:var(--muted);margin-top:4px;">All kid costs entered in <strong style="color:var(--accent)">2026 ₹</strong> — inflated using this rate</div>
+</div>
+<!-- Kid 1 -->
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:12px;">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+<span style="font-size:0.78rem;color:var(--text);font-weight:500;">👶 Kid 1</span>
+<div style="display:flex;gap:6px;">
+<button class="kid-toggle" id="kid1_yes" onclick="toggleKid(1,'yes')">Yes</button>
+<button class="kid-toggle active" id="kid1_no" onclick="toggleKid(1,'no')">No</button>
+</div>
+</div>
+<div id="kid1_inputs" style="display:none;">
+<!-- Existing or planned -->
+<div style="display:flex;gap:6px;margin-bottom:12px;">
+<button class="kid-toggle" id="kid1_existing" onclick="toggleKidType(1,'existing')">Already have</button>
+<button class="kid-toggle active" id="kid1_planned" onclick="toggleKidType(1,'planned')">Planning</button>
+</div>
+<!-- Existing kid: current age -->
+<div id="kid1_existing_inputs" style="display:none;">
+<div class="input-group">
+<label>Kid's current age (years)</label>
+<input id="kid1_current_age" max="17" min="0" oninput="refresh()" placeholder="e.g. 5" step="1" type="number" value=""/>
+</div>
+</div>
+<!-- Planned kid: P2 age at birth -->
+<div id="kid1_planned_inputs">
+<div class="input-group">
+<label><span class="lbl-p2">Partner 2</span>'s age when born</label>
+<div class="input-row">
+<input id="r_kid1_age" max="40" min="30" step="1" type="range" value="33"/>
+<span class="val-display" id="v_kid1_age">33</span>
+</div>
+</div>
+</div>
+<div class="input-group">
+<label>Annual base cost — 2026 ₹ (₹/yr)</label>
+<input id="kid1_cost" placeholder="e.g. 300000" step="25000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label>School fees — 2026 ₹ (age 5–17, ₹/yr extra)</label>
+<input id="kid1_school" placeholder="e.g. 250000" step="25000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label>College lump sum — 2026 ₹ (at age 18, ₹)</label>
+<input id="kid1_college" placeholder="e.g. 2000000" step="100000" type="number" value=""/>
+</div>
+</div>
+</div>
+<!-- Kid 2 -->
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+<span style="font-size:0.78rem;color:var(--text);font-weight:500;">👶 Kid 2</span>
+<div style="display:flex;gap:6px;">
+<button class="kid-toggle" id="kid2_yes" onclick="toggleKid(2,'yes')">Yes</button>
+<button class="kid-toggle active" id="kid2_no" onclick="toggleKid(2,'no')">No</button>
+</div>
+</div>
+<div id="kid2_inputs" style="display:none;">
+<!-- Existing or planned -->
+<div style="display:flex;gap:6px;margin-bottom:12px;">
+<button class="kid-toggle" id="kid2_existing" onclick="toggleKidType(2,'existing')">Already have</button>
+<button class="kid-toggle active" id="kid2_planned" onclick="toggleKidType(2,'planned')">Planning</button>
+</div>
+<!-- Existing kid: current age -->
+<div id="kid2_existing_inputs" style="display:none;">
+<div class="input-group">
+<label>Kid's current age (years)</label>
+<input id="kid2_current_age" max="17" min="0" oninput="refresh()" placeholder="e.g. 2" step="1" type="number" value=""/>
+</div>
+</div>
+<!-- Planned kid: P2 age at birth -->
+<div id="kid2_planned_inputs">
+<div class="input-group">
+<label><span class="lbl-p2">Partner 2</span>'s age when born</label>
+<div class="input-row">
+<input id="r_kid2_age" max="42" min="30" step="1" type="range" value="36"/>
+<span class="val-display" id="v_kid2_age">36</span>
+</div>
+</div>
+</div>
+<div class="input-group">
+<label>Annual base cost — 2026 ₹ (₹/yr)</label>
+<input id="kid2_cost" placeholder="e.g. 300000" step="25000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label>School fees — 2026 ₹ (age 5–17, ₹/yr extra)</label>
+<input id="kid2_school" placeholder="e.g. 250000" step="25000" type="number" value=""/>
+</div>
+<div class="input-group">
+<label>College lump sum — 2026 ₹ (at age 18, ₹)</label>
+<input id="kid2_college" placeholder="e.g. 2000000" step="100000" type="number" value=""/>
+</div>
+</div>
+</div>
+</div></div>
+<div class="sidebar-section">
+<div class="section-title" onclick="toggleSection(this)">🏧 Loans (EMI) <span class="chev">▼</span></div><div class="section-body">
+<div style="font-size:0.65rem;color:var(--muted);margin-bottom:14px;">EMI deducted from earnings each year from 2026 until Last EMI Year</div>
+<!-- Loan 1 -->
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+<div style="font-size:0.72rem;color:var(--accent2);font-family:'DM Mono',monospace;margin-bottom:8px;">Loan 1</div>
+<div class="one-time-row">
+<div>
+<label>Monthly EMI (₹)</label>
+<input id="emi1_amount" placeholder="e.g. 50000" step="1000" type="number" value=""/>
+<span class="money-hint" id="emi1_hint"></span>
+</div>
+<div>
+<label>Last EMI Year</label>
+<input id="emi1_year" max="2079" min="2026" placeholder="e.g. 2030" step="1" type="number" value=""/>
+</div>
+</div>
+</div>
+<!-- Loan 2 -->
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+<div style="font-size:0.72rem;color:var(--accent2);font-family:'DM Mono',monospace;margin-bottom:8px;">Loan 2</div>
+<div class="one-time-row">
+<div>
+<label>Monthly EMI (₹)</label>
+<input id="emi2_amount" placeholder="e.g. 30000" step="1000" type="number" value=""/>
+<span class="money-hint" id="emi2_hint"></span>
+</div>
+<div>
+<label>Last EMI Year</label>
+<input id="emi2_year" max="2079" min="2026" placeholder="e.g. 2028" step="1" type="number" value=""/>
+</div>
+</div>
+</div>
+<!-- Loan 3 -->
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
+<div style="font-size:0.72rem;color:var(--accent2);font-family:'DM Mono',monospace;margin-bottom:8px;">Loan 3</div>
+<div class="one-time-row">
+<div>
+<label>Monthly EMI (₹)</label>
+<input id="emi3_amount" placeholder="e.g. 20000" step="1000" type="number" value=""/>
+<span class="money-hint" id="emi3_hint"></span>
+</div>
+<div>
+<label>Last EMI Year</label>
+<input id="emi3_year" max="2079" min="2026" placeholder="e.g. 2027" step="1" type="number" value=""/>
+</div>
+</div>
+</div>
+</div></div>
+<div class="sidebar-section">
+<div class="section-title" onclick="toggleSection(this)">💸 One-Time Outflows <span class="chev">▼</span></div><div class="section-body">
+<div style="font-size:0.65rem;color:var(--muted);margin-bottom:12px;">Enter in <strong style="color:var(--accent)">today's 2026 ₹</strong> — inflated to payment year using Expenditure Inflation rate</div>
+<div id="ot_list"></div>
+<button onclick="addOTRow()" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" style="width:100%;margin-top:8px;padding:7px;background:transparent;border:1px dashed var(--border);border-radius:6px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;cursor:pointer;transition:all 0.2s;">+ Add Expense</button>
+</div></div>
+<div class="sidebar-section">
+<div class="section-title" onclick="toggleSection(this)">🎯 FIRE Target Ages <span class="chev">▼</span></div><div class="section-body">
+<div class="input-group">
+<label><span class="lbl-p1">Partner 1</span> FIRE Age <span id="lbl_p1_cur_age" style="color:var(--muted)">(currently 35)</span></label>
+<div class="input-row">
+<input id="r_vinod_fire" max="55" min="38" step="1" type="range" value="42"/>
+<span class="val-display" id="v_vinod_fire">42</span>
+</div>
+</div>
+<div class="input-group">
+<label><span class="lbl-p2">Partner 2</span> FIRE Age <span id="lbl_p2_cur_age" style="color:var(--muted)">(currently 32)</span></label>
+<div class="input-row">
+<input id="r_namrata_fire" max="55" min="35" step="1" type="range" value="42"/>
+<span class="val-display" id="v_namrata_fire">42</span>
+</div>
+</div>
+</div></div>
+<div class="sidebar-section">
+<div class="section-title" onclick="toggleSection(this)">🎲 Monte Carlo <span class="chev">▼</span></div><div class="section-body">
+<div class="input-group">
+<label>Return Volatility (std dev %)</label>
+<div class="input-row">
+<input id="r_mc_vol" max="20" min="2" step="1" type="range" value="8"/>
+<span class="val-display" id="v_mc_vol">8%</span>
+</div>
+</div>
+<div class="input-group">
+<label>Simulations</label>
+<div class="input-row">
+<input id="r_mc_n" max="5000" min="100" step="100" type="range" value="500"/>
+<span class="val-display" id="v_mc_n">500</span>
+</div>
+</div>
+<button class="run-btn" onclick="runMonteCarlo()">⚡ Run Monte Carlo</button>
+<div class="mc-info" id="mc_result">Click the button to run probability analysis on your FIRE plan.</div>
+</div></div>
 </aside>
-
 <!-- MAIN -->
 <main>
-
-  <!-- Scenario buttons -->
-  <div class="scenario-row">
-    <button class="scenario-btn active" onclick="applyScenario('base',this)">Base Case</button>
-    <button class="scenario-btn" onclick="applyScenario('optimistic',this)">Optimistic 🚀</button>
-    <button class="scenario-btn" onclick="applyScenario('conservative',this)">Conservative 🛡️</button>
-    <button class="scenario-btn" onclick="applyScenario('fire_early',this)">FIRE Early (38)</button>
-    <button class="scenario-btn" onclick="applyScenario('fire_late',this)">FIRE Late (45)</button>
-  </div>
-
-  <!-- KPI Cards -->
-  <div class="kpi-grid" id="kpi_grid">
-    <div class="kpi-card gold">
-      <div class="kpi-label">Corpus at FIRE</div>
-      <div class="kpi-value gold" id="kpi_fire_corpus">—</div>
-      <div class="kpi-sub" id="kpi_fire_year">—</div>
-    </div>
-    <div class="kpi-card blue">
-      <div class="kpi-label">Final Networth (<span class="lbl-p2">Partner 2</span> 85)</div>
-      <div class="kpi-value blue" id="kpi_final_nw">—</div>
-      <div class="kpi-sub">Projected terminal wealth</div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-label">Years to FIRE</div>
-      <div class="kpi-value green" id="kpi_years_fire">—</div>
-      <div class="kpi-sub" id="kpi_fire_age_label">—</div>
-    </div>
-    <div class="kpi-card" style="border-top-color:var(--muted);">
-      <div class="kpi-label">Networth Runs Out</div>
-      <div class="kpi-value" id="kpi_nw_zero" style="font-size:1.2rem;">—</div>
-      <div class="kpi-sub" id="kpi_nw_zero_sub">Age when networth hits zero</div>
-    </div>
-    <div class="kpi-card fire">
-      <div class="kpi-label">Monthly Draw at Retirement</div>
-      <div class="kpi-value fire" id="kpi_monthly_draw">—</div>
-      <div class="kpi-sub">Inflation-adjusted, at FIRE year</div>
-    </div>
-    <div class="kpi-card blue" style="grid-column:span 2">
-      <div class="kpi-label">PF + NPS at FIRE (Locked Retirals)</div>
-      <div class="kpi-value blue" id="kpi_retiral_fire">—</div>
-      <div class="kpi-sub" id="kpi_retiral_breakdown">—</div>
-    </div>
-  </div>
-
-  <!-- Charts Row 1 -->
-  <div class="chart-grid">
-    <div class="chart-card full">
-      <div class="chart-title">Corpus Growth Over Time (₹ Crores)</div>
-      <canvas id="chart_corpus" class="tall"></canvas>
-    </div>
-  </div>
-  <div class="chart-grid">
-    <div class="chart-card">
-      <div class="chart-title">Annual Cash Flow (₹ L)</div>
-      <canvas id="chart_cashflow"></canvas>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Income vs Expenses Trajectory</div>
-      <canvas id="chart_income_exp"></canvas>
-    </div>
-  </div>
-
-  <!-- Data Table -->
-  <div class="table-card">
-    <div class="table-header">
-      <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;">Year-by-Year Projection</div>
-      <span class="tooltip-pill">🔥 = FIRE year</span>
-    </div>
-    <div class="table-wrapper">
-      <table id="proj_table">
-        <thead>
-          <tr>
-            <th>Year</th>
-            <th><span class="lbl-p1">P1</span> / <span class="lbl-p2">P2</span> Age</th>
-            <th>Total Income (₹L)</th>
-            <th>Total Expenses (₹L)</th>
-            <th>Kids Cost (₹L)</th>
-            <th>One-Time (₹L)</th>
-            <th>PF+NPS Contrib (₹L)</th>
-            <th>Free Cash (₹L)</th>
-            <th>PF Vinod (₹Cr)</th>
-            <th>NPS Vinod (₹Cr)</th>
-            <th>PF Namrata (₹Cr)</th>
-            <th>NPS Namrata (₹Cr)</th>
-            <th>Total Retirals (₹Cr)</th>
-            <th>Free Corpus (₹Cr)</th>
-            <th>Networth (₹Cr)</th>
-          </tr>
-        </thead>
-        <tbody id="table_body"></tbody>
-      </table>
-    </div>
-  </div>
-
+<!-- Scenario buttons -->
+<div class="scenario-row">
+<button class="scenario-btn active" onclick="applyScenario('base',this)">Base Case</button>
+<button class="scenario-btn" onclick="applyScenario('optimistic',this)">Optimistic 🚀</button>
+<button class="scenario-btn" onclick="applyScenario('conservative',this)">Conservative 🛡️</button>
+<button class="scenario-btn" onclick="applyScenario('fire_early',this)">FIRE Early (38)</button>
+<button class="scenario-btn" onclick="applyScenario('fire_late',this)">FIRE Late (45)</button>
+</div>
+<!-- KPI Cards -->
+<div class="kpi-grid" id="kpi_grid">
+<div class="kpi-card gold">
+<div class="kpi-label">Corpus at FIRE</div>
+<div class="kpi-value gold" id="kpi_fire_corpus">—</div>
+<div class="kpi-sub" id="kpi_fire_year">—</div>
+</div>
+<div class="kpi-card blue">
+<div class="kpi-label">Final Networth (<span class="lbl-p2">Partner 2</span> 85)</div>
+<div class="kpi-value blue" id="kpi_final_nw">—</div>
+<div class="kpi-sub">Projected terminal wealth</div>
+</div>
+<div class="kpi-card green">
+<div class="kpi-label">Years to FIRE</div>
+<div class="kpi-value green" id="kpi_years_fire">—</div>
+<div class="kpi-sub" id="kpi_fire_age_label">—</div>
+</div>
+<div class="kpi-card" style="border-top-color:var(--muted);">
+<div class="kpi-label">Networth Runs Out</div>
+<div class="kpi-value" id="kpi_nw_zero" style="font-size:1.2rem;">—</div>
+<div class="kpi-sub" id="kpi_nw_zero_sub">Age when networth hits zero</div>
+</div>
+<div class="kpi-card fire">
+<div class="kpi-label">Monthly Draw at Retirement</div>
+<div class="kpi-value fire" id="kpi_monthly_draw">—</div>
+<div class="kpi-sub">Inflation-adjusted, at FIRE year</div>
+</div>
+<div class="kpi-card blue" style="grid-column:span 2">
+<div class="kpi-label">PF + NPS at FIRE (Locked Retirals)</div>
+<div class="kpi-value blue" id="kpi_retiral_fire">—</div>
+<div class="kpi-sub" id="kpi_retiral_breakdown">—</div>
+</div>
+</div>
+<!-- Charts Row 1 -->
+<div class="chart-grid">
+<div class="chart-card full">
+<div class="chart-title">Corpus Growth Over Time (₹ Crores)</div>
+<canvas class="tall" id="chart_corpus"></canvas>
+</div>
+</div>
+<div class="chart-grid">
+<div class="chart-card">
+<div class="chart-title">Annual Cash Flow (₹ L)</div>
+<canvas id="chart_cashflow"></canvas>
+</div>
+<div class="chart-card">
+<div class="chart-title">Income vs Expenses Trajectory</div>
+<canvas id="chart_income_exp"></canvas>
+</div>
+</div>
+<!-- Data Table -->
+<div class="table-card">
+<div class="table-header">
+<div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;">Year-by-Year Projection</div>
+<span class="tooltip-pill">🔥 = FIRE year</span>
+</div>
+<div class="table-wrapper">
+<table id="proj_table">
+<thead>
+<tr>
+<th>Year</th>
+<th><span class="lbl-p1">P1</span> / <span class="lbl-p2">P2</span> Age</th>
+<th>Total Income (₹L)</th>
+<th>Total Expenses (₹L)</th>
+<th>Kids Cost (₹L)</th>
+<th>One-Time (₹L)</th>
+<th>EMI (₹L)</th>
+<th>PF+NPS Contrib (₹L)</th>
+<th>Free Cash (₹L)</th>
+<th>PF Vinod (₹Cr)</th>
+<th>NPS Vinod (₹Cr)</th>
+<th>PF Namrata (₹Cr)</th>
+<th>NPS Namrata (₹Cr)</th>
+<th>Total Retirals (₹Cr)</th>
+<th>Free Corpus (₹Cr)</th>
+<th>Networth (₹Cr)</th>
+</tr>
+</thead>
+<tbody id="table_body"></tbody>
+</table>
+</div>
+</div>
 </main>
 </div>
-
 <script>
 // ─── Helpers ───────────────────────────────────────────────────────────────
 const fmt = (n, dec=2) => (n/1e7).toFixed(dec); // crores
@@ -860,6 +909,11 @@ function getInputs() {
       college_lump: +document.getElementById('kid2_college').value,
     },
     ot: readOTItems(),
+    loans: [
+      { emi: +document.getElementById('emi1_amount').value || 0, last_year: +document.getElementById('emi1_year').value || 0 },
+      { emi: +document.getElementById('emi2_amount').value || 0, last_year: +document.getElementById('emi2_year').value || 0 },
+      { emi: +document.getElementById('emi3_amount').value || 0, last_year: +document.getElementById('emi3_year').value || 0 },
+    ],
   };
 }
 
@@ -941,8 +995,14 @@ function simulate(inp, returnVariance=0) {
         return sum + o.amount * Math.pow(1 + inp.inflation, years_to_payment);
       }, 0);
 
-    // Free cash = income - expenses - one_time (retirals are NOT subtracted)
-    const free_cash = total_income - total_exp - one_time;
+    // EMI loans — fixed monthly amount * 12, active from 2026 to last_year inclusive
+    const total_emi = inp.loans.reduce((sum, loan) => {
+      if(loan.emi > 0 && loan.last_year >= yr) return sum + loan.emi * 12;
+      return sum;
+    }, 0);
+
+    // Free cash = income - expenses - one_time - EMIs (retirals are NOT subtracted)
+    const free_cash = total_income - total_exp - one_time - total_emi;
 
     // Retirals: grow contributions year-on-year at salary raise rate, stop at FIRE
     // t=0 is 2026, so contribution in year t = base_contrib * (1+raise)^t
@@ -982,6 +1042,7 @@ function simulate(inp, returnVariance=0) {
       vinod_age, namrata_age,
       vinod_working, namrata_working,
       total_income, total_exp, one_time, one_time_labels,
+      total_emi,
       total_retiral_contrib,
       kid1_exp, kid2_exp,
       free_cash,
@@ -1121,6 +1182,7 @@ function updateTable(rows, inp) {
       <td>${fmtL(r.total_exp)}</td>
       <td>${kid_label}</td>
       <td>${ot_label}</td>
+      <td style="color:var(--danger)">${r.total_emi > 0 ? fmtL(r.total_emi) : '<span style="color:var(--muted)">—</span>'}</td>
       <td style="color:var(--accent2)">${r.total_retiral_contrib > 0 ? fmtL(r.total_retiral_contrib) : '<span style="color:var(--muted)">—</span>'}</td>
       <td class="${fc_class}">${fmtL(r.free_cash)}</td>
       <td style="color:var(--accent2)">${(r.pf_vinod/1e7).toFixed(2)}</td>
@@ -1286,6 +1348,15 @@ function toggleKidType(n, type) {
   refresh();
 }
 
+// ─── Collapsible sections ────────────────────────────────────────────────────
+function toggleSection(titleEl) {
+  const body = titleEl.nextElementSibling;
+  if(!body || !body.classList.contains('section-body')) return;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  titleEl.classList.toggle('open', !isOpen);
+}
+
 // ─── Name helpers ───────────────────────────────────────────────────────────
 function p1() { const v = document.getElementById('p1_name').value.trim(); return v || 'Partner 1'; }
 function p2() { const v = document.getElementById('p2_name').value.trim(); return v || 'Partner 2'; }
@@ -1336,6 +1407,22 @@ const MONEY_IDS = [
   'kid2_cost','kid2_school','kid2_college',
 ];
 MONEY_IDS.forEach(bindMoneyHint);
+
+// EMI money hints and listeners
+['emi1_amount','emi2_amount','emi3_amount'].forEach(id => {
+  const el = document.getElementById(id);
+  if(!el) return;
+  const hint = document.getElementById(id.replace('amount','hint'));
+  el.addEventListener('input', () => {
+    const v = +el.value;
+    if(hint) hint.textContent = v ? formatIndian(v) : '';
+    refresh();
+  });
+});
+['emi1_year','emi2_year','emi3_year'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('input', refresh);
+});
 
 // Non-money fields — plain refresh
 ['kid1_current_age','kid2_current_age'].forEach(id => {
